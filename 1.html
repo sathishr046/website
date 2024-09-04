@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book My Seats</title>
+    <style>
+        body {
+            background-image: url('images/bus1.JPG');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.9);
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            text-align: left;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            border-color: #007BFF;
+            background-color: #f0f8ff;
+            transform: scale(1.02);
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .message {
+            color: green;
+            margin-top: 15px;
+            display: none;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+        .message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Book Your Seat</h1>
+        <form id="bookingForm">
+            <label for="name">Your Name:</label>
+            <input type="text" name="name" id="name" placeholder="Your Name" required onkeydown="moveToNext(event, 'USN')">
+
+            <label for="USN">Your USN:</label>
+            <input type="text" name="USN" id="USN" placeholder="Your USN" required pattern="[A-Za-z0-9]{10}" onkeydown="moveToNext(event, 'Branch')">
+
+            <label for="Branch">Your Branch:</label>
+            <select name="Branch" id="Branch" required onkeydown="submitOnEnter(event)">
+                <option value="" disabled selected>Select Your Branch</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Information Science">Information Science</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="ECE">Electronics and Communication Engineering (ECE)</option>
+            </select>
+
+            <button type="button" class="btn" onclick="storeData()">Select Bus</button>
+            <div class="message" id="message">Your data has been saved successfully!</div>
+        </form>
+    </div>
+
+    <script>
+        function moveToNext(event, nextFieldId) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission on Enter
+                const nextField = document.getElementById(nextFieldId);
+                if (nextField) {
+                    nextField.focus();
+                }
+            }
+        }
+
+        function submitOnEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission on Enter
+                const submitButton = document.querySelector('.btn');
+                if (submitButton) {
+                    submitButton.click(); // Trigger click event of the submit button
+                }
+            }
+        }
+
+        function storeData() {
+            const name = document.getElementById('name').value;
+            const USN = document.getElementById('USN').value;
+            const branch = document.getElementById('Branch').value;
+
+            // Validate USN pattern
+            const usnPattern = /^[A-Za-z0-9]{10}$/;
+            if (!usnPattern.test(USN)) {
+                alert('Invalid USN. Please enter a valid 10-character USN.');
+                return;
+            }
+
+            // Store the data in localStorage
+            localStorage.setItem('name', name);
+            localStorage.setItem('USN', USN);
+            localStorage.setItem('Branch', branch);
+
+            // Show success message
+            const message = document.getElementById('message');
+            message.classList.add('show');
+
+            // Redirect to bus selection page after 1 second
+            setTimeout(function() {
+                window.location.href = '2.html';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

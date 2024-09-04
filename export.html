@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export localStorage Data</title>
+</head>
+<body>
+    <h1>Export localStorage Data</h1>
+    <button onclick="exportData()">Export Data</button>
+    <script>
+        function exportData() {
+            // Retrieve data from localStorage
+            const data = {
+                name: localStorage.getItem('name'),
+                USN: localStorage.getItem('USN'),
+                Branch: localStorage.getItem('Branch')
+            };
+
+            // Convert the data to a JSON string
+            const dataStr = JSON.stringify(data, null, 2);
+
+            // Create a Blob (Binary Large Object) from the JSON string
+            const blob = new Blob([dataStr], { type: 'application/json' });
+
+            // Create a link element
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'localStorageData.txt'; // Name for the downloaded file
+
+            // Programmatically click the link to trigger the download
+            link.click();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus 4 Seat Booking</title>
+    <style>
+        body {
+            background-image: url('images/bus2.PNG');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .seats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .seat {
+            width: 75px; /* Increased size */
+            height: 75px; /* Increased size */
+            background-color: #007BFF;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+        .seat.selected {
+            background-color: #28a745;
+        }
+        .seat.booked {
+            background-color: #d9534f;
+            cursor: not-allowed;
+        }
+        .seat span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 20px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn.disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bus 4 Seat Booking</h1>
+        <p>Drop Location: Doddaballapur</p>
+        <div class="seats">
+            <!-- Adjusted seat layout for a bus format -->
+            <div class="seat" id="seat1"><span>1</span></div>
+            <div class="seat" id="seat2"><span>2</span></div>
+            <div></div> <!-- Empty cell for aisle spacing -->
+            <div></div> <!-- Empty cell for aisle spacing -->
+            <div class="seat" id="seat3"><span>3</span></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div class="seat" id="seat4"><span>4</span></div>
+            
+            <div class="seat" id="seat5"><span>5</span></div>
+            <!-- Aisle -->
+            
+            <!-- Right side seats -->
+            <div class="seat" id="seat6"><span>6</span></div>
+            <div class="seat" id="seat7"><span>7</span></div>
+            <div></div>
+            <div class="seat" id="seat8"><span>8</span></div>
+            
+            <div class="seat" id="seat9"><span>9</span></div>
+            <div class="seat" id="seat10"><span>10</span></div>
+            <!-- Aisle -->
+            
+            <!-- Extra rows (if needed) -->
+            <div class="seat" id="seat11"><span>11</span></div>
+            <div></div>
+            <div class="seat" id="seat12"><span>12</span></div>
+            
+            <div class="seat" id="seat13"><span>13</span></div>
+            
+            <div class="seat" id="seat14"><span>14</span></div>
+            <div class="seat" id="seat15"><span>15</span></div>
+            <!-- Aisle -->
+            <div></div>
+            <div class="seat" id="seat16"><span>16</span></div>
+            
+            <div class="seat" id="seat17"><span>17</span></div>
+            <div class="seat" id="seat18"><span>18</span></div>
+            <div class="seat" id="seat19"><span>19</span></div>
+            <div></div>
+            <div class="seat" id="seat20"><span>20</span></div>
+            <div class="seat" id="seat21"><span>21</span></div>
+            <div class="seat" id="seat22"><span>22</span></div>
+            <div class="seat" id="seat23"><span>23</span></div>
+            <div class="seat" id="seat24"><span>24</span></div>
+            <div class="seat" id="seat25"><span>25</span></div>
+            <div class="seat" id="seat26"><span>26</span></div>
+        </div>
+    </div>
+
+    <script>
+        const seats = document.querySelectorAll('.seat');
+        const busNumber = 4; // Update this number for each bus page
+        const dropLocation = "Doddaballapur"; // Set the drop location
+
+        // Function to check if user details are already entered
+        function checkUserDetails() {
+            if (!localStorage.getItem('name') || !localStorage.getItem('USN') || !localStorage.getItem('Branch')) {
+                // Redirect to form page if details are missing
+                window.location.href = '1.html'; // Update this path as needed
+            }
+        }
+
+        // Load booked seats from localStorage
+        function loadBookedSeats() {
+            // Check user details before proceeding
+            checkUserDetails();
+
+            // Pre-book seat 3 by driver
+            const seat3Details = {
+                name: 'Driver',
+                USN: 'N/A',
+                branch: 'N/A',
+                dropLocation: 'N/A',
+                seatText: 'Driver seat'
+            };
+            localStorage.setItem(`seat3_bus${busNumber}`, JSON.stringify(seat3Details));
+
+            seats.forEach(seat => {
+                const seatId = `${seat.id}_bus${busNumber}`; // Append bus number to seat ID
+                const bookedDetails = localStorage.getItem(seatId);
+                if (bookedDetails) {
+                    seat.classList.add('booked');
+                    const details = JSON.parse(bookedDetails);
+                    seat.querySelector('span').textContent = details.seatText;
+                }
+
+                seat.addEventListener('click', () => {
+                    if (!seat.classList.contains('booked')) {
+                        // Store booking details in localStorage and redirect to booking details page
+                        const seatText = `Booked by ${localStorage.getItem('name')}`;
+                        const bookingDetails = {
+                            name: localStorage.getItem('name'),
+                            USN: localStorage.getItem('USN'),
+                            branch: localStorage.getItem('Branch'),
+                            dropLocation: dropLocation, // Include drop location
+                            seatText: seatText
+                        };
+                        localStorage.setItem(seatId, JSON.stringify(bookingDetails));
+                        
+                        window.location.href = `bookingDetails.html?seatId=${seat.id}&busNumber=${busNumber}`;
+                    } else {
+                        const details = JSON.parse(bookedDetails);
+                        // Open booking details page in a new tab with parameters
+                        window.open(`bookingDetails.html?seatId=${seat.id}&busNumber=${busNumber}`, '_blank');
+                    }
+                });
+            });
+        }
+
+        loadBookedSeats();
+    </script>
+</body>
+</html>

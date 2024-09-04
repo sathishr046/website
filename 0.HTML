@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Bus Booking</title>
+    <style>
+        body {
+            background-image: url('images/bus.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-shadow: 2px 2px 4px #000000;
+            position: relative;
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 20px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .reboot-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ff4d4d;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .reboot-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <button class="reboot-btn" onclick="reboot()">Reboot</button>
+    <div class="container">
+        <h1>Welcome to Nagarjuna College Bus Seat Booking</h1>
+        <p>Book your seats conveniently for your college bus travel.</p>
+        <a href="1.html" class="btn">Book My Seats</a>
+    </div>
+
+    <script>
+        function reboot() {
+            if (confirm('Are you sure you want to clear all stored data?')) {
+                // Open a new window to ask for username and password
+                const username = prompt('Enter username:');
+                const password = prompt('Enter password:');
+                
+                // Replace these credentials with your own
+                const validUsername = 'admin';
+                const validPassword = 'password123';
+
+                if (username === validUsername && password === validPassword) {
+                    localStorage.clear();
+                    alert('All stored data has been cleared.');
+                    // Redirect to another page (e.g., home page or a specific URL)
+                    
+                } else {
+                    alert('Invalid credentials. Data was not cleared.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
