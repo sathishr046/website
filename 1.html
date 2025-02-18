@@ -93,6 +93,7 @@
                 <option value="Information Science">Information Science</option>
                 <option value="Computer Science">Computer Science</option>
                 <option value="ECE">Electronics and Communication Engineering (ECE)</option>
+                <option value="Artificial Intelligence">Artificial Intelligence</option>
             </select>
 
             <button type="button" class="btn" onclick="storeData()">Select Bus</button>
@@ -124,27 +125,26 @@
         function storeData() {
             const name = document.getElementById('name').value;
             const USN = document.getElementById('USN').value;
-            const branch = document.getElementById('Branch').value;
+            const Branch = document.getElementById('Branch').value;
 
-            // Validate USN pattern
-            const usnPattern = /^[A-Za-z0-9]{10}$/;
-            if (!usnPattern.test(USN)) {
-                alert('Invalid USN. Please enter a valid 10-character USN.');
+            if (!name || !USN || !Branch) {
+                alert('Please fill in all fields');
                 return;
             }
 
-            // Store the data in localStorage
+            // Store data in localStorage
             localStorage.setItem('name', name);
             localStorage.setItem('USN', USN);
-            localStorage.setItem('Branch', branch);
+            localStorage.setItem('Branch', Branch);
 
             // Show success message
             const message = document.getElementById('message');
+            message.style.display = 'block';
             message.classList.add('show');
 
-            // Redirect to bus selection page after 1 second
-            setTimeout(function() {
-                window.location.href = '2.html';
+            // Redirect to analysis page after a short delay
+            setTimeout(() => {
+                window.location.href = 'analyze.html';
             }, 1000);
         }
     </script>

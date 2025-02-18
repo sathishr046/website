@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Fee Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-image: url('images/bus6.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            background-color: rgba(0, 0, 0, 0.1);
+            background-blend-mode: overlay;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            backdrop-filter: blur(3px);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        .upload-section {
+            border: 2px dashed #666;
+            background-color: rgba(255, 255, 255, 0.75);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .upload-section.drag-over {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #fileInput {
+            display: none;
+        }
+        .analysis-section {
+            margin-top: 20px;
+            display: none;
+        }
+        .result-section {
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .detail-label {
+            font-weight: bold;
+            width: 150px;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            flex-grow: 1;
+        }
+        .fees-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .fees-table th, .fees-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .fees-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .fees-table td {
+            vertical-align: middle;
+        }
+        .amount-cell {
+            text-align: right;
+            font-family: monospace;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .match {
+            color: green;
+            font-weight: bold;
+        }
+        .mismatch {
+            color: red;
+            font-weight: bold;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .loading:after {
+            content: "...";
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60% { content: "..."; }
+            80% { content: "...."; }
+            100% { content: "....."; }
+        }
+        .next-button {
+            display: none;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .next-button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+        .next-button.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Fee Analysis</h1>
+        
+        <div class="upload-section" id="dropZone">
+            <h2>Upload Fee Receipt</h2>
+            <p>Drag and drop your PDF receipt here or click to select</p>
+            <input type="file" id="fileInput" accept=".pdf">
+            <button class="btn" onclick="document.getElementById('fileInput').click()">Select File</button>
+        </div>
+
+        <div class="loading" id="loadingIndicator">
+            Analyzing receipt
+        </div>
+
+        <div id="analysisSection" class="analysis-section" style="display: none;">
+            <div class="result-section">
+                <h2>Student Details</h2>
+                <div id="studentDetails">
+                    <!-- Student details will be populated here -->
+                </div>
+                <div id="comparisonResults">
+                    <!-- Comparison results will be shown here -->
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h2>Fee Details</h2>
+                <table class="fees-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Particular</th>
+                            <th>Concession</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feesTableBody">
+                        <!-- Fee details will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="result-section">
+                <h2>Summary</h2>
+                <div class="detail-row">
+                    <div class="detail-label">Total Amount:</div>
+                    <div class="detail-value" id="totalAmount"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Transport Fee Status:</div>
+                    <div class="detail-value" id="transportStatus"></div>
+                </div>
+                <button id="nextButton" class="next-button" onclick="proceedToNext()">
+                    Proceed to Select Bus Location
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const analysisSection = document.getElementById('analysisSection');
+
+            if (!dropZone || !fileInput || !loadingIndicator || !analysisSection) {
+                console.error('Required DOM elements not found');
+                return;
+            }
+
+            // Drag and drop handlers
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+        });
+
+        async function handleFile(file) {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const analysisSection = document.getElementById('analysisSection');
+
+            if (!loadingIndicator || !analysisSection) {
+                console.error('Required DOM elements not found');
+                return;
+            }
+
+            if (!file.type.includes('pdf')) {
+                alert('Please upload a PDF file');
+                return;
+            }
+
+            loadingIndicator.style.display = 'block';
+            analysisSection.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://localhost:5000/analyze', {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to analyze receipt');
+                }
+
+                const result = await response.json();
+                displayResults(result);
+            } catch (error) {
+                console.error('Error analyzing receipt:', error);
+                loadingIndicator.style.display = 'none';
+
+                // Show error in the analysis section
+                analysisSection.style.display = 'block';
+                const studentDetails = document.getElementById('studentDetails');
+                if (studentDetails) {
+                    studentDetails.innerHTML = `
+                        <div class="detail-row error">
+                            <h3>Error Analyzing Receipt</h3>
+                            <p>${error.message}</p>
+                            <p>Please make sure:</p>
+                            <ul>
+                                <li>The backend server is running (check if the Flask server is running)</li>
+                                <li>The PDF file is not corrupted</li>
+                                <li>The PDF file contains valid fee receipt data</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+            } finally {
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+        }
+
+        function getStoredStudentData() {
+            return {
+                name: localStorage.getItem('name'),
+                usn: localStorage.getItem('USN'),
+                branch: localStorage.getItem('Branch')
+            };
+        }
+
+        function getBranchAbbreviation(fullBranchName) {
+            const branchMappings = {
+                'Data Science': 'BE/DS',
+                'Information Science': 'BE/IS',
+                'Computer Science': 'BE/CS',
+                'Electronics and Communication Engineering': 'BE/EC',
+                'ECE': 'BE/EC',
+                'Artificial Intelligence': 'BE/AI'
+            };
+            return branchMappings[fullBranchName] || fullBranchName;
+        }
+
+        function getFullBranchName(abbreviation) {
+            const abbreviationMappings = {
+                'BE/DS': 'Data Science',
+                'BE/IS': 'Information Science',
+                'BE/CS': 'Computer Science',
+                'BE/EC': 'Electronics and Communication Engineering',
+                'BE/AI': 'Artificial Intelligence'
+            };
+            return abbreviationMappings[abbreviation.toUpperCase()] || abbreviation;
+        }
+
+        function compareDetails(analyzedData) {
+            const storedData = getStoredStudentData();
+            const comparisonDiv = document.getElementById('comparisonResults');
+            
+            if (!comparisonDiv) {
+                console.error('Comparison results div not found');
+                return { usnMatch: false };
+            }
+
+            comparisonDiv.innerHTML = '<h3>Comparison with Stored Details:</h3>';
+
+            // Compare name
+            const nameMatch = storedData.name && analyzedData.name && 
+                            storedData.name.toLowerCase() === analyzedData.name.toLowerCase();
+            comparisonDiv.innerHTML += `
+                <div class="result-item">
+                    <span>Name: </span>
+                    <span class="${nameMatch ? 'match' : 'mismatch'}">
+                        ${nameMatch ? 'Matches' : 'Does not match'} 
+                        (Stored: ${storedData.name || 'Not found'})
+                    </span>
+                </div>`;
+
+            // Compare USN
+            const usnMatch = storedData.usn && analyzedData.usn && 
+                           storedData.usn.toLowerCase() === analyzedData.usn.toLowerCase();
+            comparisonDiv.innerHTML += `
+                <div class="result-item">
+                    <span>USN: </span>
+                    <span class="${usnMatch ? 'match' : 'mismatch'}">
+                        ${usnMatch ? 'Matches' : 'Does not match'} 
+                        (Stored: ${storedData.usn || 'Not found'})
+                    </span>
+                </div>`;
+
+            if (!usnMatch) {
+                comparisonDiv.innerHTML += `
+                    <div class="result-item" style="color: red; font-weight: bold; margin-top: 10px;">
+                        Error: USN does not match. Cannot proceed with verification.
+                    </div>`;
+            }
+
+            // Compare branch - handle both full names and abbreviations
+            const storedBranchAbbr = getBranchAbbreviation(storedData.branch);
+            const analyzedBranchAbbr = getBranchAbbreviation(analyzedData.branch);
+            const branchMatch = storedBranchAbbr && analyzedBranchAbbr && 
+                              storedBranchAbbr.toLowerCase() === analyzedBranchAbbr.toLowerCase();
+            
+            comparisonDiv.innerHTML += `
+                <div class="result-item">
+                    <span>Branch: </span>
+                    <span class="${branchMatch ? 'match' : 'mismatch'}">
+                        ${branchMatch ? 'Matches' : 'Does not match'} 
+                        (Stored: ${storedData.branch || 'Not found'} - ${storedBranchAbbr || ''})
+                    </span>
+                </div>`;
+
+            return { usnMatch };
+        }
+
+        function validateFeeDetails(result) {
+            if (!result || !result.fees || !Array.isArray(result.fees)) {
+                return false;
+            }
+
+            // Check if transport fee exists
+            const hasTransportFee = result.fees.some(fee => 
+                fee.particular && fee.particular.toLowerCase().includes('transport')
+            );
+
+            return hasTransportFee;
+        }
+
+        function displayResults(result) {
+            const analysisSection = document.getElementById('analysisSection');
+            const studentDetails = document.getElementById('studentDetails');
+            const feesTableBody = document.getElementById('feesTableBody');
+            const totalAmount = document.getElementById('totalAmount');
+            const transportStatus = document.getElementById('transportStatus');
+            const nextButton = document.getElementById('nextButton');
+
+            if (!analysisSection || !studentDetails || !feesTableBody || 
+                !totalAmount || !transportStatus || !nextButton) {
+                console.error('Required DOM elements not found');
+                return;
+            }
+
+            analysisSection.style.display = 'block';
+
+            // Display student details
+            studentDetails.innerHTML = `
+                <div class="detail-row">
+                    <div class="detail-label">Name:</div>
+                    <div class="detail-value">${result.student_details.name || 'Not found'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">USN:</div>
+                    <div class="detail-value">${result.student_details.usn || 'Not found'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Branch:</div>
+                    <div class="detail-value">${result.student_details.branch || 'Not found'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Receipt No:</div>
+                    <div class="detail-value">${result.student_details.receipt_no || 'Not found'}</div>
+                </div>
+            `;
+
+            // Compare with stored details and get USN match status
+            const { usnMatch } = compareDetails(result.student_details);
+
+            // Display fees
+            feesTableBody.innerHTML = result.fees.map((fee, index) => `
+                <tr>
+                    <td>${fee.sno || (index + 1)}</td>
+                    <td>${fee.particular}</td>
+                    <td class="amount-cell">${fee.concession.toFixed(2)}</td>
+                    <td class="amount-cell">${fee.amount.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            // Display total and transport status
+            totalAmount.textContent = `₹${result.total_amount.toFixed(2)}`;
+            transportStatus.textContent = result.transport_fee_found ? 
+                'Transport fee found' : 'Transport fee not found';
+            transportStatus.style.color = result.transport_fee_found ? '#28a745' : '#dc3545';
+
+            // Show/hide next button based on validation AND USN match
+            if (validateFeeDetails(result) && usnMatch) {
+                nextButton.classList.add('show');
+            } else {
+                nextButton.classList.remove('show');
+            }
+        }
+
+        function proceedToNext() {
+            // Save the validated status to localStorage
+            localStorage.setItem('feeValidated', 'true');
+            // Redirect to the bus selection page
+            window.location.href = '2.html';
+        }
+    </script>
+</body>
+</html>

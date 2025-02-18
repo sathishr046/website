@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Panel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('images/bus7.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 800px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        input {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #3498db;
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .booking-entry {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .booking-entry:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .booking-entry p {
+            margin: 0.5rem 0;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .booking-entry strong {
+            color: #34495e;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .pagination button {
+            min-width: 40px;
+            height: 40px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+
+        .pagination button.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .pagination button:disabled {
+            background: #f5f5f5;
+            border-color: #ddd;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #bookingList {
+            margin: 1.5rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        #bookingList::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #bookingList::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        #bookingList::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 4px;
+        }
+
+        #bookingList::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 0 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            padding-left: 40px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+            background-repeat: no-repeat;
+            background-position: 12px center;
+            background-size: 20px;
+        }
+
+        .search-input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginSection">
+            <h2>Admin Authentication Required</h2>
+            <div class="login-form">
+                <input type="text" id="username" placeholder="Username" autocomplete="off">
+                <input type="password" id="password" placeholder="Password">
+                <button onclick="authenticate()">Login</button>
+            </div>
+        </div>
+        
+        <div id="exportSection">
+            <h2>Admin Control Panel</h2>
+            <div class="export-options">
+                <button onclick="viewBookings()">View Bookings</button>
+                <button onclick="exportToPDF()">Export PDF</button>
+                <button onclick="clearAllData()" class="danger">Clear All Data</button>
+            </div>
+            <div class="search-container" id="searchContainer" style="display: none;">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name, USN, branch, or location..." oninput="searchBookings()">
+            </div>
+            <div id="bookingList" style="display: none;">
+                <!-- Booking details will be displayed here -->
+            </div>
+            <div id="pagination" class="pagination" style="display: none;">
+                <!-- Pagination buttons will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        const ITEMS_PER_PAGE = 5;
+        let currentPage = 1;
+        let allBookings = [];
+        let filteredBookings = [];
+
+        // Check if already authenticated
+        window.onload = function() {
+            if (!sessionStorage.getItem('authenticated')) {
+                document.getElementById('exportSection').style.display = 'none';
+                document.getElementById('loginSection').style.display = 'block';
+            } else {
+                document.getElementById('exportSection').style.display = 'block';
+                document.getElementById('loginSection').style.display = 'none';
+            }
+        }
+
+        function authenticate() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'password123') {
+                sessionStorage.setItem('authenticated', 'true');
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('exportSection').style.display = 'block';
+            } else {
+                alert('Invalid credentials. Please try again.');
+            }
+        }
+
+        function showSearchAndList() {
+            document.getElementById('searchContainer').style.display = 'flex';
+            document.getElementById('bookingList').style.display = 'block';
+            document.getElementById('pagination').style.display = 'flex';
+        }
+
+        function viewBookings() {
+            if (!sessionStorage.getItem('authenticated')) {
+                alert('Please authenticate first');
+                return;
+            }
+
+            // Get all bookings
+            allBookings = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.includes('_bus')) {
+                    const bookingData = JSON.parse(localStorage.getItem(key));
+                    const [seatId, busNumber] = key.split('_bus');
+                    allBookings.push({
+                        busNumber,
+                        seatId,
+                        ...bookingData
+                    });
+                }
+            }
+
+            // Sort bookings by bus number and seat
+            allBookings.sort((a, b) => {
+                if (a.busNumber !== b.busNumber) {
+                    return a.busNumber.localeCompare(b.busNumber);
+                }
+                return a.seatId.localeCompare(b.seatId);
+            });
+
+            // Clear search input and filtered bookings
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            filteredBookings = [];
+
+            // Show search and list containers
+            showSearchAndList();
+
+            currentPage = 1;
+            displayBookings();
+            setupPagination();
+        }
+
+        function exportToPDF() {
+            if (!sessionStorage.getItem('authenticated')) {
+                alert('Please authenticate first');
+                return;
+            }
+
+            // Load bookings if not already loaded
+            if (allBookings.length === 0) {
+                viewBookings();
+            }
+
+            // Show search and list containers
+            showSearchAndList();
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add title
+            doc.setFontSize(16);
+            doc.text('Bus Booking Details', 15, 15);
+            doc.setFontSize(12);
+
+            // Prepare data for table
+            const tableData = allBookings.map(booking => [
+                booking.busNumber,
+                booking.seatId,
+                booking.name,
+                booking.USN,
+                booking.branch,
+                booking.dropLocation
+            ]);
+
+            // Add table
+            doc.autoTable({
+                startY: 25,
+                head: [['Bus', 'Seat', 'Name', 'USN', 'Branch', 'Drop Location']],
+                body: tableData,
+                theme: 'grid',
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 2
+                },
+                headStyles: {
+                    fillColor: [0, 123, 255],
+                    textColor: 255
+                }
+            });
+
+            // Save the PDF
+            const date = new Date().toISOString().split('T')[0];
+            doc.save(`bus_booking_list_${date}.pdf`);
+        }
+
+        function clearAllData() {
+            if (!sessionStorage.getItem('authenticated')) {
+                alert('Please authenticate first');
+                return;
+            }
+
+            if (confirm('Are you sure you want to clear all booking data? This action cannot be undone!')) {
+                // Clear only bus booking related data
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.includes('_bus')) {
+                        keysToRemove.push(key);
+                    }
+                }
+                
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                alert('All booking data has been cleared successfully!');
+                
+                // Show empty list
+                allBookings = [];
+                filteredBookings = [];
+                showSearchAndList();
+                displayBookings();
+                setupPagination();
+            }
+        }
+
+        function displayBookings() {
+            const bookingList = document.getElementById('bookingList');
+            bookingList.innerHTML = '<h3>Current Bookings:</h3>';
+
+            const bookingsToShow = filteredBookings.length > 0 ? filteredBookings : allBookings;
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const pageBookings = bookingsToShow.slice(startIndex, endIndex);
+
+            if (pageBookings.length === 0) {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                if (searchTerm && filteredBookings.length === 0) {
+                    bookingList.innerHTML += '<div class="no-results">No bookings found matching your search.</div>';
+                } else {
+                    bookingList.innerHTML += '<div class="no-results">No bookings available.</div>';
+                }
+                return;
+            }
+
+            pageBookings.forEach(booking => {
+                const bookingEntry = document.createElement('div');
+                bookingEntry.className = 'booking-entry';
+                bookingEntry.innerHTML = `
+                    <p><strong>Bus:</strong> ${booking.busNumber}</p>
+                    <p><strong>Seat:</strong> ${booking.seatId}</p>
+                    <p><strong>Name:</strong> ${booking.name}</p>
+                    <p><strong>USN:</strong> ${booking.USN}</p>
+                    <p><strong>Branch:</strong> ${booking.branch}</p>
+                    <p><strong>Drop Location:</strong> ${booking.dropLocation}</p>
+                `;
+                bookingList.appendChild(bookingEntry);
+            });
+        }
+
+        function setupPagination() {
+            const bookingsToShow = filteredBookings.length > 0 ? filteredBookings : allBookings;
+            const totalPages = Math.ceil(bookingsToShow.length / ITEMS_PER_PAGE);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            // Previous button
+            const prevButton = document.createElement('button');
+            prevButton.innerText = '←';
+            prevButton.disabled = currentPage === 1;
+            prevButton.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayBookings();
+                    setupPagination();
+                }
+            };
+            pagination.appendChild(prevButton);
+
+            // Page buttons
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.innerText = i;
+                button.classList.toggle('active', i === currentPage);
+                button.onclick = () => {
+                    currentPage = i;
+                    displayBookings();
+                    setupPagination();
+                };
+                pagination.appendChild(button);
+            }
+
+            // Next button
+            const nextButton = document.createElement('button');
+            nextButton.innerText = '→';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.onclick = () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayBookings();
+                    setupPagination();
+                }
+            };
+            pagination.appendChild(nextButton);
+        }
+
+        function searchBookings() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredBookings = [];
+                displayBookings();
+                setupPagination();
+                return;
+            }
+            
+            // Filter bookings based on search term
+            filteredBookings = allBookings.filter(booking => {
+                const searchableFields = [
+                    booking.name,
+                    booking.USN,
+                    booking.branch,
+                    booking.dropLocation,
+                    booking.busNumber.toString(),
+                    booking.seatId
+                ];
+                
+                return searchableFields.some(field => 
+                    field && field.toString().toLowerCase().includes(searchTerm)
+                );
+            });
+
+            // Reset to first page and display filtered results
+            currentPage = 1;
+            displayBookings();
+            setupPagination();
+        }
+    </script>
+</body>
+</html>
